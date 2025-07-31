@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Analysis: Dairy Feed Additives</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals & Deep Ocean -->
+    <!-- Application Structure Plan: The SPA is designed as a guided narrative to make the technical report accessible. It starts with a high-level introduction to the three key additives. It then visually explains their synergistic action, a core concept from the report. The main interactive element is a life-stage selector ("Calf" vs. "Cow"), which allows users to dive into the specific data relevant to them without being overwhelmed. This task-oriented approach is more user-friendly than the report's linear chapter structure. The application concludes with a practical summary of economic considerations. This structure transforms the dense report into an intuitive, story-driven exploration tool. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Core functions of MOS, Beta-Glucans, Bacillus. Goal: Compare. Viz: Three-column card layout with icons (Unicode) and concise text. Justification: Easy side-by-side comparison of the key players. Method: HTML/Tailwind.
+        - Report Info: Synergistic mechanism of action. Goal: Organize/Explain Process. Viz: HTML/CSS flowchart. Justification: Visually simplifies the complex multi-layered defense concept. Method: HTML/Tailwind.
+        - Report Info: Calf ADG, Cow Fertility Metrics. Goal: Inform. Viz: Large KPI-style text. Justification: Highlights key performance numbers for immediate impact. Method: HTML/Tailwind.
+        - Report Info: Calf Scours Data. Goal: Compare. Viz: Bar Chart. Justification: Directly compares incidence/severity between control and supplemented groups. Library: Chart.js.
+        - Report Info: Cow Milk Yield over time. Goal: Change. Viz: Line Chart. Justification: Effectively shows the impact on lactation persistency. Library: Chart.js.
+        - Report Info: Cow Mastitis Factors. Goal: Show Composition. Viz: Donut Chart. Justification: Breaks down the components of mastitis mitigation into a simple whole. Library: Chart.js.
+        All interactions (tab switching) are handled by Vanilla JS to update content and charts dynamically. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF8; /* Warm Neutral */
+            color: #333D45; /* Dark Slate */
+        }
+        .nav-button {
+            transition: all 0.3s ease;
+        }
+        .nav-button.active {
+            background-color: #005F73; /* Deep Ocean */
+            color: #FFFFFF;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 95, 115, 0.2);
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 380px;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <main class="container mx-auto px-4 py-8 md:py-12">
+
+        <header class="text-center mb-16">
+            <h1 class="text-4xl md:text-5xl font-black text-[#005F73] mb-3">A New Paradigm in Dairy Herd Resilience</h1>
+            <p class="text-lg md:text-xl max-w-3xl mx-auto text-[#5A6C7A]">An interactive exploration of how synergistic feed additives—MOS, β-Glucans, and *Bacillus* spp.—build healthier, more productive cattle from the gut up.</p>
+        </header>
+
+        <section id="additives" class="mb-20">
+            <h2 class="text-3xl font-bold text-center text-[#0A9396] mb-10">The Three Pillars of Gut Health</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100 text-center">
+                    <div class="text-5xl mb-4">🛡️</div>
+                    <h3 class="text-2xl font-bold text-[#005F73] mb-2">MOS</h3>
+                    <p class="font-semibold mb-2">Mannan-Oligosaccharides</p>
+                    <p class="text-[#5A6C7A]">Acts as a "decoy," binding to pathogens like *E. coli* and *Salmonella* to prevent them from attaching to the gut wall and causing infection.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100 text-center">
+                    <div class="text-5xl mb-4">💪</div>
+                    <h3 class="text-2xl font-bold text-[#005F73] mb-2">β-Glucans</h3>
+                    <p class="font-semibold mb-2">Beta-Glucans</p>
+                    <p class="text-[#5A6C7A]">Primes the innate immune system, placing cells like macrophages in a state of heightened readiness for a faster, more robust response to disease.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100 text-center">
+                    <div class="text-5xl mb-4">🌿</div>
+                    <h3 class="text-2xl font-bold text-[#005F73] mb-2">*Bacillus* spp.</h3>
+                    <p class="font-semibold mb-2">Spore-forming Probiotics</p>
+                    <p class="text-[#5A6C7A]">Survives to the intestine to enhance digestion with enzymes, produce antimicrobials, and create an ideal environment for beneficial microbes.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="synergy" class="mb-20">
+            <h2 class="text-3xl font-bold text-center text-[#0A9396] mb-4">The Power of Synergy</h2>
+            <p class="text-lg text-center max-w-2xl mx-auto text-[#5A6C7A] mb-10">These additives don't just work alone; they create a multi-layered defense system that is more robust than any single component.</p>
+            <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+                <div class="flex flex-col md:flex-row items-center justify-around space-y-6 md:space-y-0 md:space-x-4">
+                    <div class="text-center flex-1">
+                        <p class="font-bold text-lg text-[#005F73]">Pathogen Challenge</p>
+                        <p class="text-5xl mt-2">🦠</p>
+                    </div>
+                    <div class="text-4xl text-[#94D2BD] font-light hidden md:block">&rarr;</div>
+                    <div class="text-4xl text-[#94D2BD] font-light md:hidden">&darr;</div>
+                    <div class="text-center flex-1 bg-[#E9F5F5] p-4 rounded-lg border-l-4 border-[#0A9396]">
+                        <p class="font-bold text-lg text-[#005F73]">Layer 1: Binding</p>
+                        <p class="text-sm text-[#5A6C7A]">MOS intercepts pathogens, preventing attachment.</p>
+                    </div>
+                    <div class="text-4xl text-[#94D2BD] font-light hidden md:block">&rarr;</div>
+                    <div class="text-4xl text-[#94D2BD] font-light md:hidden">&darr;</div>
+                    <div class="text-center flex-1 bg-[#E9F5F5] p-4 rounded-lg border-l-4 border-[#0A9396]">
+                        <p class="font-bold text-lg text-[#005F73]">Layer 2: Immune Priming</p>
+                        <p class="text-sm text-[#5A6C7A]">β-Glucans have immune cells ready for a rapid response.</p>
+                    </div>
+                     <div class="text-4xl text-[#94D2BD] font-light hidden md:block">&rarr;</div>
+                    <div class="text-4xl text-[#94D2BD] font-light md:hidden">&darr;</div>
+                    <div class="text-center flex-1 bg-[#E9F5F5] p-4 rounded-lg border-l-4 border-[#0A9396]">
+                        <p class="font-bold text-lg text-[#005F73]">Layer 3: Inhibition</p>
+                        <p class="text-sm text-[#5A6C7A]">*Bacillus* outcompetes pathogens and releases antimicrobials.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="interactive-data" class="mb-12">
+            <h2 class="text-3xl font-bold text-center text-[#0A9396] mb-4">Efficacy Across Life Stages</h2>
+            <p class="text-lg text-center max-w-2xl mx-auto text-[#5A6C7A] mb-10">The benefits are targeted to the unique challenges of calves and cows. Select a life stage below to explore the data.</p>
+            
+            <div class="flex justify-center space-x-4 mb-10">
+                <button id="btn-calf" class="nav-button active text-lg font-bold py-3 px-8 bg-white rounded-full shadow-md">Focus on Calves</button>
+                <button id="btn-cow" class="nav-button text-lg font-bold py-3 px-8 bg-white rounded-full shadow-md">Focus on Cows</button>
+            </div>
+
+            <div id="content-calf" class="content-section active">
+                <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg border border-gray-100">
+                    <h3 class="text-2xl font-bold text-center text-[#005F73] mb-8">Building the Foundation for Future Productivity</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                        <div class="text-center">
+                            <p class="text-xl font-semibold text-[#5A6C7A]">Improved Growth</p>
+                            <p class="text-7xl font-black text-[#EE9B00] my-2">+64<span class="text-3xl align-baseline">g/day</span></p>
+                            <p class="text-sm text-gray-500 max-w-xs mx-auto">Average daily gain increase in pre-weaned calves supplemented with MOS (meta-analysis of 23 studies).</p>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-xl text-center mb-2">Reduced Scours Incidence</h4>
+                            <p class="text-sm text-center text-gray-600 mb-4">Prophylactic use significantly mitigates the risk and severity of neonatal diarrhea.</p>
+                            <div class="chart-container">
+                                <canvas id="calfChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="content-cow" class="content-section">
+                <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg border border-gray-100">
+                    <h3 class="text-2xl font-bold text-center text-[#005F73] mb-8">Optimizing the Engine of Production</h3>
+                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                        <div class="lg:col-span-2">
+                            <h4 class="font-bold text-xl text-center mb-2">Increased Milk Yield & Persistency</h4>
+                            <p class="text-sm text-center text-gray-600 mb-4">Additives improve rumen function, leading to more energy and consistently higher milk production.</p>
+                            <div class="chart-container">
+                                <canvas id="cowChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="space-y-6">
+                            <div class="text-center bg-[#E9F5F5] p-4 rounded-lg">
+                                <p class="text-lg font-semibold text-[#5A6C7A]">Improved Fertility</p>
+                                <p class="text-5xl font-black text-[#EE9B00] my-1">-26<span class="text-2xl align-baseline">days</span></p>
+                                <p class="text-sm text-gray-500">Average reduction in days open, a key driver of reproductive efficiency.</p>
+                            </div>
+                             <div class="text-center bg-[#E9F5F5] p-4 rounded-lg">
+                                <p class="text-lg font-semibold text-[#5A6C7A]">Reduced Mastitis</p>
+                                <p class="text-5xl font-black text-[#EE9B00] my-1">&darr; SCC</p>
+                                <p class="text-sm text-gray-500">Improved gut health reduces systemic inflammation, allowing for a more effective immune response in the udder.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="text-center text-gray-400 text-sm mt-20 border-t pt-8">
+            <p>This interactive application is a synthesis of the "Deep-Dive Analysis of Mannan-Oligosaccharides, Beta-Glucans, and Bacillus spp." report.</p>
+            <p>Data is for illustrative purposes. Always consult with a qualified nutritionist for specific recommendations.</p>
+        </footer>
+
+    </main>
+
+    <script>
+        const calfBtn = document.getElementById('btn-calf');
+        const cowBtn = document.getElementById('btn-cow');
+        const calfContent = document.getElementById('content-calf');
+        const cowContent = document.getElementById('content-cow');
+
+        let calfChartInstance = null;
+        let cowChartInstance = null;
+
+        const chartColors = {
+            ocean: '#005F73',
+            teal: '#0A9396',
+            aqua: '#94D2BD',
+            orange: '#EE9B00',
+            rust: '#AE2012',
+            lightGray: '#E9F5F5'
+        };
+
+        const wrapLabel = (label) => {
+            const maxLength = 16;
+            if (label.length <= maxLength) return label;
+            const words = label.split(' ');
+            const lines = [];
+            let currentLine = '';
+            for (const word of words) {
+                if ((currentLine + ' ' + word).trim().length > maxLength) {
+                    lines.push(currentLine.trim());
+                    currentLine = word;
+                } else {
+                    currentLine = (currentLine + ' ' + word).trim();
+                }
+            }
+            if (currentLine) lines.push(currentLine.trim());
+            return lines;
+        };
+
+        const tooltipTitleCallback = (tooltipItems) => {
+            const item = tooltipItems[0];
+            let label = item.chart.data.labels[item.dataIndex];
+            if (Array.isArray(label)) {
+              return label.join(' ');
+            }
+            return label;
+        };
+
+        const chartDefaults = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        color: '#5A6C7A',
+                        font: { size: 14 }
+                    }
+                },
+                tooltip: {
+                    callbacks: { title: tooltipTitleCallback },
+                    backgroundColor: '#333D45',
+                    titleFont: { size: 14, weight: 'bold' },
+                    bodyFont: { size: 12 },
+                    padding: 10,
+                    cornerRadius: 4
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: '#EAEAEA' },
+                    ticks: { color: '#5A6C7A', font: { size: 12 } }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#5A6C7A', font: { size: 12 } }
+                }
+            }
+        };
+
+        const calfChartData = {
+            type: 'bar',
+            data: {
+                labels: ['Diarrhea Incidence', 'Diarrhea Severity'],
+                datasets: [
+                    {
+                        label: 'Control Group',
+                        data: [100, 100],
+                        backgroundColor: chartColors.lightGray,
+                        borderColor: chartColors.aqua,
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Supplemented Group',
+                        data: [65, 50],
+                        backgroundColor: chartColors.teal,
+                        borderColor: chartColors.ocean,
+                        borderWidth: 2
+                    }
+                ]
+            },
+            options: { ...chartDefaults,
+                scales: {
+                    y: { ...chartDefaults.scales.y,
+                         title: { display: true, text: 'Relative Score (%)', color: '#5A6C7A' }
+                    },
+                    x: { ...chartDefaults.scales.x }
+                }
+            }
+        };
+
+        const cowChartData = {
+            type: 'line',
+            data: {
+                labels: ['Week 1', 'Week 4', 'Week 8', 'Week 12', 'Week 16'],
+                datasets: [
+                    {
+                        label: 'Control Cow',
+                        data: [32, 38, 41, 40, 38],
+                        borderColor: chartColors.aqua,
+                        backgroundColor: 'transparent',
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 5,
+                        pointBackgroundColor: chartColors.aqua
+                    },
+                    {
+                        label: 'Supplemented Cow',
+                        data: [33, 40, 43.5, 42.5, 41],
+                        borderColor: chartColors.ocean,
+                        backgroundColor: 'transparent',
+                        tension: 0.4,
+                        borderWidth: 4,
+                        pointRadius: 5,
+                        pointBackgroundColor: chartColors.ocean
+                    }
+                ]
+            },
+            options: { ...chartDefaults,
+                scales: {
+                    y: { ...chartDefaults.scales.y,
+                         title: { display: true, text: 'Milk Yield (kg/day)', color: '#5A6C7A' }
+                    },
+                    x: { ...chartDefaults.scales.x }
+                }
+            }
+        };
+
+        function renderCalfChart() {
+            if (calfChartInstance) calfChartInstance.destroy();
+            const ctx = document.getElementById('calfChart').getContext('2d');
+            calfChartInstance = new Chart(ctx, calfChartData);
+        }
+
+        function renderCowChart() {
+            if (cowChartInstance) cowChartInstance.destroy();
+            const ctx = document.getElementById('cowChart').getContext('2d');
+            cowChartInstance = new Chart(ctx, cowChartData);
+        }
+
+        function switchView(view) {
+            if (view === 'calf') {
+                calfBtn.classList.add('active');
+                cowBtn.classList.remove('active');
+                calfContent.classList.add('active');
+                cowContent.classList.remove('active');
+                renderCalfChart();
+            } else if (view === 'cow') {
+                cowBtn.classList.add('active');
+                calfBtn.classList.remove('active');
+                cowContent.classList.add('active');
+                calfContent.classList.remove('active');
+                renderCowChart();
+            }
+        }
+
+        calfBtn.addEventListener('click', () => switchView('calf'));
+        cowBtn.addEventListener('click', () => switchView('cow'));
+
+        window.onload = () => {
+            switchView('calf');
+        };
+
+    </script>
+</body>
+</html>
